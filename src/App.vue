@@ -1,15 +1,24 @@
 <template>
   <div id="app">
-    <div>sad</div>
+    <div class="filter-wrap">
+      <MultiRangeFilter
+        min="100"
+        max="200"
+        knobSize="16"
+      />
+    </div>
   </div>
 </template>
 
 <script>
+import MultiRangeFilter from './components/MultiRangeFilter.vue';
+
 export default {
-  name: 'app',
-  data () {
-  }
-}
+  name: 'App',
+  components: {
+    MultiRangeFilter,
+  },
+};
 </script>
 
 <style>
@@ -17,10 +26,11 @@ export default {
 
 #app {
   font-family: 'Roboto', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
   display: flex;
   justify-content: center;
+}
+
+.filter-wrap {
+  width: 280px;
 }
 </style>
