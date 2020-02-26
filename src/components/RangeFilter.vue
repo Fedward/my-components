@@ -1,14 +1,14 @@
 <template>
   <div>
-    <div>{{min}}<br>{{max}}</div>
+    <div>{{currentMin}}<br>{{currentMax}}</div>
     <div class="range-filter">
-
+      {{ haha }}
       <div class="slider">
         <div class="slider__rail"></div>
         <div class="slider__inactive-rail"></div>
         <div class="slider__inactive-rail slider__inactive-rail_right"></div>
         <div class="slider__knob" ref="lower"></div>
-        <div class="slider__knob" ref="upper"></div>
+        <div class="slider__knob" ref="upper" @mousedown="dragStart" @touchstart="dragStart"></div>
       </div>
     </div>
   </div>
@@ -16,8 +16,39 @@
 
 <script>
 export default {
-  name: 'MultiRangeFilter',
-  props: ['min', 'max'],
+  name: 'RangeFilter',
+  props: ['min', 'max', 'knobSize'],
+  data() {
+    return {
+      currentMin: this.min,
+      currentMax: this.max,
+      minLeftPos: 0,
+      maxLeftPos: 0,
+      haha: '',
+    };
+  },
+  computed: {
+    currentMinPos() {
+      return 0;
+    },
+  },
+  mounted() {
+    // this.bindEvents();
+  },
+  beforeDestroy() {
+    // this.unbindEvents();
+  },
+  methods: {
+    dragStart(e) {
+      if (e.type === 'touchstart') {
+        console.log('touch');
+      } else {
+        console.log('mouse');
+      }
+
+      e.preventDefault();
+    },
+  },
 };
 </script>
 
@@ -29,7 +60,7 @@ export default {
 
 @knob-size: 16px;
 @knob-border-size: 2px;
-@slider-height: @knob-size + 2 * @knob-border-size;
+@slider-height: @knob-size + @knob-border-size;
 @rail-height: 4px;
 
 .slider {

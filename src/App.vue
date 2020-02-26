@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="filter-wrap">
-      <MultiRangeFilter
+      <RangeFilter
         min="100"
         max="200"
         knobSize="16"
@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import MultiRangeFilter from './components/MultiRangeFilter.vue';
+import RangeFilter from './components/RangeFilter.vue';
 
 export default {
   name: 'App',
   components: {
-    MultiRangeFilter,
+    RangeFilter,
   },
 };
 </script>
