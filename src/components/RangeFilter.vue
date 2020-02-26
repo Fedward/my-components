@@ -2,13 +2,18 @@
   <div>
     <div>{{currentMin}}<br>{{currentMax}}</div>
     <div class="range-filter">
-      {{ haha }}
-      <div class="slider">
-        <div class="slider__rail"></div>
-        <div class="slider__inactive-rail"></div>
-        <div class="slider__inactive-rail slider__inactive-rail_right"></div>
-        <div class="slider__knob" ref="lower"></div>
-        <div class="slider__knob" ref="upper" @mousedown="dragStart" @touchstart="dragStart"></div>
+      <div class="range">
+
+      </div>
+
+      <div class="slider" :style="styles.slider">
+        <div class="slider__rail" :style="styles.rail"></div>
+        <div class="slider__inactive-rail" :style="styles.rail"></div>
+        <div class="slider__inactive-rail slider__inactive-rail_right" :style="styles.rail"></div>
+        <div class="slider__slide-zone">
+          <div class="slider__knob" ref="lower" :style="styles.knob"></div>
+          <div class="slider__knob" ref="upper" @mousedown="dragStart" @touchstart="dragStart" :style="styles.knob"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -17,7 +22,7 @@
 <script>
 export default {
   name: 'RangeFilter',
-  props: ['min', 'max', 'knobSize'],
+  props: ['min', 'max', 'knobSize', 'railWidth'],
   data() {
     return {
       currentMin: this.min,
@@ -25,6 +30,21 @@ export default {
       minLeftPos: 0,
       maxLeftPos: 0,
       haha: '',
+      styles: {
+        slider: {
+          height: `${this.knobSize}px`,
+        },
+        rail: {
+          height: `${this.railWidth}px`,
+        },
+        slideZone: {
+
+        },
+        knob: {
+          width: `${this.knobSize}px`,
+          height: `${this.knobSize}px`,
+        },
+      },
     };
   },
   computed: {
@@ -58,29 +78,24 @@ export default {
   background-color: #F7F7F7;
 }
 
-@knob-size: 16px;
-@knob-border-size: 2px;
-@slider-height: @knob-size + @knob-border-size;
-@rail-height: 4px;
 
 .slider {
   position: relative;
-  height: @slider-height;
 
   &__rail {
     position: absolute;
-    top: @slider-height / 2 - @rail-height / 2;
+    top: 50%;
+    transform: translateY(-50%);
     width: 100%;
-    height: @rail-height;
     background-color: #C62828;
     border-radius: 1px
   }
 
   &__inactive-rail {
     position: absolute;
-    top: @slider-height / 2 - @rail-height / 2;
+    top: 50%;
+    transform: translateY(-50%);
     width: 50px;
-    height: @rail-height;
     background-color: #DFDFDF;
     border-radius: 1px;
 
@@ -90,14 +105,17 @@ export default {
     }
   }
 
+  &__slide-zone {
+    position: relative;
+    height: 100%;
+  }
+
   &__knob {
     position: absolute;
-    width: @knob-size;
-    height: @knob-size;
     background-color: #FFFFFF;
     border-radius: 50%;
-    border: 1px solid #dadada;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15);
+    transform: translateX(-50%);
     cursor: pointer;
 
     &:active {

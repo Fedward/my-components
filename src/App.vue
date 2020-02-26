@@ -5,6 +5,7 @@
         min="100"
         max="200"
         knobSize="16"
+        railWidth="4"
       />
     </div>
   </div>
