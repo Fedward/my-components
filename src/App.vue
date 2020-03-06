@@ -1,13 +1,11 @@
 <template>
   <div id="app">
-    <div class="filter-wrap">
-      <RangeFilter
-        min="100"
-        max="200"
-        dotSize="16"
-        railWidth="4"
-      />
-    </div>
+    <RangeFilter
+      min="300"
+      max="600"
+      dotSize="16"
+      railWidth="4"
+    />
   </div>
 </template>
 
@@ -27,11 +25,7 @@ export default {
 
 #app {
   font-family: 'Roboto', sans-serif;
-  display: flex;
-  justify-content: center;
-}
-
-.filter-wrap {
   width: 280px;
+  margin: auto;
 }
 </style>

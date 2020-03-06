@@ -1,28 +1,37 @@
 <template>
   <div>
-    <div>{{currentMin}}<br>{{currentMax}}</div>
+    <div>{{lowerVal}}<br>{{upperVal}}</div>
     <div class="range-filter">
       <div class="range">
-        <input type="text" v-model="lowerPos">
-        <input type="text" v-model="upperPos">
+        <input type="number" :min="min" :max="upperVal" v-model="lowerVal">
+        <input type="number" :min="lowerVal" :max="max" v-model="upperVal">
       </div>
 
       <div class="slider" :style="styles.slider">
         <div class="slider__rail" :style="styles.rail"></div>
-        <div class="slider__inactive-rail" :style="styles.rail"></div>
-        <div class="slider__inactive-rail slider__inactive-rail_right" :style="styles.rail"></div>
+        <div
+          class="slider__inactive-rail"
+          :style="[styles.rail, { width: `${lowerRatio}%` }]"
+        ></div>
+        <div
+          class="slider__inactive-rail slider__inactive-rail_right"
+          :style="[styles.rail, { width: `${100 - upperRatio}%` }]"
+        ></div>
+
         <div class="slider__slide-zone" :style="styles.slideZone">
           <div
             class="slider__dot"
             ref="lower"
-            :style="[styles.dot, { left: `${lowerPos}%` }]"
+            :style="[styles.dot, { left: `${lowerRatio}%` }]"
+            @mousedown="dragStart($event, 'lower')"
+            @touchstart="dragStart($event, 'lower')"
           ></div>
           <div
             class="slider__dot"
             ref="upper"
-            :style="[styles.dot, { left: `${upperPos}%` }]"
-            @mousedown="dragStart"
-            @touchstart="dragStart"
+            :style="[styles.dot, { left: `${upperRatio}%` }]"
+            @mousedown="dragStart($event, 'upper')"
+            @touchstart="dragStart($event, 'upper')"
           ></div>
         </div>
       </div>
@@ -60,17 +69,16 @@ const getCoordsRelativeToElem = (e, elem) => {
   };
 };
 
-const getAvailableRangeForDot = () => {};
-
 export default {
   name: 'RangeFilter',
   props: ['min', 'max', 'dotSize', 'railWidth'],
   data() {
     return {
-      currentMin: this.min,
-      currentMax: this.max,
+      lowerVal: Number.parseInt(this.min, 10),
+      upperVal: Number.parseInt(this.max, 10),
       lowerPos: 0,
       upperPos: 100,
+      intervalSize: this.max - this.min,
       haha: '',
       styles: {
         slider: {
@@ -91,9 +99,24 @@ export default {
     };
   },
   computed: {
+    lowerRatio() {
+      const ratio = (this.lowerVal - this.intervalSize) / this.intervalSize;
+
+      return ratio * 100;
+    },
+    upperRatio() {
+      const ratio = (this.upperVal - this.intervalSize) / this.intervalSize;
+
+      return ratio * 100;
+    },
     currentMinPos() {
       return 0;
     },
+  },
+  created() {
+    console.log('interval size', this.intervalSize);
+    console.log('lower val', this.lowerVal);
+    console.log('upper val', this.upperVal);
   },
   mounted() {
     // this.bindEvents();
@@ -102,14 +125,17 @@ export default {
     // this.unbindEvents();
   },
   methods: {
-    dragStart(e) {
+    dragStart(e, dotId) {
       if (e.type === 'touchstart') {
         console.log('touch');
       } else {
         console.log('mouse');
       }
 
-      e.preventDefault();
+      // e.preventDefault();
+    },
+    getValidPos(pos, dotId) {
+
     },
   },
 };
@@ -138,13 +164,11 @@ export default {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 50px;
     background-color: #DFDFDF;
     border-radius: 1px;
 
     &_right {
       right: 0;
-      width: 50px;
     }
   }
 
