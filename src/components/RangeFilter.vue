@@ -4,6 +4,7 @@
     <div class="range-filter">
       <div class="range">
         <input class="range__input" type="number" :min="min" :max="upperVal" v-model="lowerVal">
+        -
         <input class="range__input" type="number" :min="lowerVal" :max="max" v-model="upperVal">
       </div>
 
@@ -168,6 +169,25 @@ export default {
 .range-filter {
   padding: 16px 24px 32px;
   background-color: #F7F7F7;
+}
+
+.range {
+  margin-bottom: 16px;
+
+  &__input {
+    font-size: 16px;
+    line-height: 22px;
+    padding: 8px 16px;
+    border: 1px solid #DFDFDF;
+    border-radius: 4px;
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
 }
 
 .slider {
