@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import RangeFilter from './components/RangeFilter.vue';
+import RangeFilter from './components/RangeFilter/index.vue';
 
 export default {
   name: 'App',

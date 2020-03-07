@@ -4,33 +4,33 @@
     <div class="range-filter">
       <div class="range">
         <input class="range__input" type="number" :min="min" :max="upperVal" v-model="lowerVal">
-        -
+        <span class="range__separator">-</span>
         <input class="range__input" type="number" :min="lowerVal" :max="max" v-model="upperVal">
       </div>
 
-      <div class="slider" :style="styles.slider">
+      <div class="slider" :style="styles.slider" ref="slider">
         <div class="slider__rail" :style="styles.rail"></div>
         <div
           class="slider__inactive-rail"
-          :style="[styles.rail, { width: `${lowerPercentageRatio}%` }]"
+          :style="[styles.rail, { width: `${dotsPositions.lower}%` }]"
         ></div>
         <div
           class="slider__inactive-rail slider__inactive-rail_right"
-          :style="[styles.rail, { width: `${100 - upperPercentageRatio}%` }]"
+          :style="[styles.rail, { width: `${100 - dotsPositions.upper}%` }]"
         ></div>
 
         <div class="slider__slide-zone" :style="styles.slideZone">
           <div
             class="slider__dot"
             ref="lower"
-            :style="[styles.dot, { left: `${lowerPercentageRatio}%` }]"
+            :style="[styles.dot, { left: `${dotsPositions.lower}%` }]"
             @mousedown="dragStart($event, 'lowe')"
             @touchstart="dragStart($event, 'lower')"
           ></div>
           <div
             class="slider__dot"
             ref="upper"
-            :style="[styles.dot, { left: `${upperPercentageRatio}%` }]"
+            :style="[styles.dot, { left: `${dotsPositions.upper}%` }]"
             @mousedown="dragStart($event, 'upper')"
             @touchstart="dragStart($event, 'upper')"
           ></div>
@@ -41,31 +41,7 @@
 </template>
 
 <script>
-const getOffsetX = (elem) => {
-  const { body, documentElement: doc } = document;
-  const { left } = elem.getBoundingClientRect();
-  const { pageXOffset } = window;
-  const offsetX = left + (pageXOffset || doc.scrollLeft) - (doc.clientLeft || body.clientLeft || 0);
-
-  return offsetX;
-};
-
-/**
- * Получить координаты по оси X
- * клика относительно элемента
- *
- * @param {MouseEvent|TouchEvent} e
- * @param {HTMLDivElement} elem - element relative to which coordinate X is calculated
- *
- * @returns {number} - X axis value
- */
-const getEventOffsetXRelativeToElem = (e, elem) => {
-  const event = e.targetTouches ? e.targetTouches[0] : e;
-  const elemOffsetX = getOffsetX(elem);
-  const eventOffsetXFromElem = event.pageX - elemOffsetX;
-
-  return eventOffsetXFromElem;
-};
+import { getEventOffsetXRelativeToElem } from './utils';
 
 export default {
   name: 'RangeFilter',
@@ -90,7 +66,12 @@ export default {
     return {
       lowerVal: this.min,
       upperVal: this.max,
+      dotsPositions: {
+        lower: 0,
+        upper: 100,
+      },
       gap: 100 / (this.max - this.min),
+      scale: 1,
       currentDraggableDot: null,
       styles: {
         slider: {
@@ -111,35 +92,62 @@ export default {
     };
   },
   computed: {
-    lowerPercentageRatio() {
-      return (this.lowerVal - this.min) * this.gap;
-    },
-    upperPercentageRatio() {
-      return (this.upperVal - this.min) * this.gap;
+    percentageRatios() {
+      return {
+        lower: (this.lowerVal - this.min) * this.gap,
+        upper: (this.upperVal - this.min) * this.gap,
+      };
     },
     dotValueRanges() {
       return {
-        lower: [this.min, this.upperVal],
-        upper: [this.lowerVal, this.max],
+        lower: [0, this.percentageRatios.lower],
+        upper: [this.percentageRatios.lower, 100],
       };
     },
   },
   methods: {
+    setScale() {
+      this.scale = Math.floor(this.$refs.slider.offsetWidth) / 100;
+    },
     dragStart(e, dotId) {
       this.currentDraggableDot = dotId;
       e.preventDefault();
     },
-    dragMove() {
+    dragMove(e) {
       if (!this.currentDraggableDot) {
         return;
       }
+
+      e.preventDefault();
+      const pos = getEventOffsetXRelativeToElem(e, this.$refs.slider) / this.scale;
+      this.setDotPos(pos, this.currentDraggableDot);
 
     },
     dragEnd() {
       this.currentDraggableDot = null;
     },
-    getValidPos(pos, dotId) {
+    setDotPos(pos, dotId) {
+      const validPos = this.getValidPos(pos, dotId);
+      const changePos = this.percentageRatios[dotId] - validPos;
 
+      if (!changePos) {
+        return;
+      }
+
+      
+    },
+    getValidPos(pos, dotId) {
+      const range = this.dotValueRanges[dotId];
+
+      if (pos < range[0]) {
+        return range[0];
+      }
+
+      if (pos > range[1]) {
+        return range[1];
+      }
+
+      return pos;
     },
     bindEvents() {
       document.addEventListener('touchmove', this.dragMove);
@@ -157,6 +165,7 @@ export default {
     },
   },
   mounted() {
+    this.setScale();
     this.bindEvents();
   },
   beforeDestroy() {
@@ -173,8 +182,12 @@ export default {
 
 .range {
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   &__input {
+    flex: 1;
     font-size: 16px;
     line-height: 22px;
     padding: 8px 16px;
@@ -187,6 +200,11 @@ export default {
       -webkit-appearance: none;
       margin: 0;
     }
+  }
+
+  &__separator {
+    margin-left: 2px;
+    margin-right: 2px;
   }
 }
 
