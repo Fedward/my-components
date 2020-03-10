@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <RangeFilter
-      min="300"
-      max="600"
+      min="1"
+      max="4"
       dotSize="16"
       railWidth="4"
     />

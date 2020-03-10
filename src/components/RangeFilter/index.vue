@@ -1,11 +1,25 @@
 <template>
   <div>
-    <div>{{lowerVal}}<br>{{upperVal}}</div>
+    <div>{{values.lower}}<br>{{values.upper}}</div>
     <div class="range-filter">
       <div class="range">
-        <input class="range__input" type="number" :min="min" :max="upperVal" v-model="lowerVal">
+        <input
+          class="range__input"
+          type="number"
+          :min="min"
+          :max="values.upper"
+          v-model="values.lower"
+          @input="setPosByValue($event.target.value, 'lower')"
+        >
         <span class="range__separator">-</span>
-        <input class="range__input" type="number" :min="lowerVal" :max="max" v-model="upperVal">
+        <input
+          class="range__input"
+          type="number"
+          :min="values.lower"
+          :max="max"
+          v-model="values.upper"
+          @input="setPosByValue($event.target.value, 'upper')"
+        >
       </div>
 
       <div class="slider" :style="styles.slider" ref="slider">
@@ -19,7 +33,7 @@
           :style="[styles.rail, { width: `${100 - dotsPositions.upper}%` }]"
         ></div>
 
-        <div class="slider__slide-zone" :style="styles.slideZone">
+        <div class="slider__slide-zone">
           <div
             class="slider__dot"
             ref="lower"
@@ -64,25 +78,25 @@ export default {
   },
   data() {
     return {
-      lowerVal: this.min,
-      upperVal: this.max,
+      values: {
+        lower: this.min,
+        upper: this.max,
+      },
       dotsPositions: {
         lower: 0,
         upper: 100,
       },
-      gap: 100 / (this.max - this.min), // distance between each value
+      gap: 100 / (this.max - this.min), // distance between each value (%)
       scale: 1,
       currentDraggableDot: null,
       styles: {
         slider: {
           height: `${this.dotSize}px`,
+          marginLeft: `${this.dotSize / 2}px`,
+          marginRight: `${this.dotSize / 2}px`,
         },
         rail: {
           height: `${this.railWidth}px`,
-        },
-        slideZone: {
-          marginLeft: `${this.dotSize / 2}px`,
-          marginRight: `${this.dotSize / 2}px`,
         },
         dot: {
           // 2px - double border size
@@ -93,12 +107,6 @@ export default {
     };
   },
   computed: {
-    percentageRatios() {
-      return {
-        lower: (this.lowerVal - this.min) * this.gap,
-        upper: (this.upperVal - this.min) * this.gap,
-      };
-    },
     dotValueRanges() {
       return {
         lower: [0, this.dotsPositions.upper],
@@ -139,6 +147,7 @@ export default {
       }
 
       this.dotsPositions[dotId] = validPos;
+      this.setValueByPos(validPos, dotId);
     },
     getValidPos(pos, dotId) {
       const range = this.dotValueRanges[dotId];
@@ -152,6 +161,12 @@ export default {
       }
 
       return pos;
+    },
+    setValueByPos(pos, dotId) {
+      this.values[dotId] = Math.floor(pos / this.gap + parseInt(this.min, 10));
+    },
+    setPosByValue(val, valueType) {
+      this.dotsPositions[valueType] = (val - this.min) * this.gap;
     },
     bindEvents() {
       document.addEventListener('touchmove', this.dragMove);
