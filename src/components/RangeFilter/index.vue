@@ -24,7 +24,7 @@
             class="slider__dot"
             ref="lower"
             :style="[styles.dot, { left: `${dotsPositions.lower}%` }]"
-            @mousedown="dragStart($event, 'lowe')"
+            @mousedown="dragStart($event, 'lower')"
             @touchstart="dragStart($event, 'lower')"
           ></div>
           <div
@@ -70,7 +70,7 @@ export default {
         lower: 0,
         upper: 100,
       },
-      gap: 100 / (this.max - this.min),
+      gap: 100 / (this.max - this.min), // distance between each value
       scale: 1,
       currentDraggableDot: null,
       styles: {
@@ -85,6 +85,7 @@ export default {
           marginRight: `${this.dotSize / 2}px`,
         },
         dot: {
+          // 2px - double border size
           width: `${this.dotSize - 2}px`,
           height: `${this.dotSize - 2}px`,
         },
@@ -100,8 +101,8 @@ export default {
     },
     dotValueRanges() {
       return {
-        lower: [0, this.percentageRatios.lower],
-        upper: [this.percentageRatios.lower, 100],
+        lower: [0, this.dotsPositions.upper],
+        upper: [this.dotsPositions.lower, 100],
       };
     },
   },
@@ -121,20 +122,23 @@ export default {
       e.preventDefault();
       const pos = getEventOffsetXRelativeToElem(e, this.$refs.slider) / this.scale;
       this.setDotPos(pos, this.currentDraggableDot);
-
     },
     dragEnd() {
+      if (!this.currentDraggableDot) {
+        return;
+      }
+
       this.currentDraggableDot = null;
     },
     setDotPos(pos, dotId) {
       const validPos = this.getValidPos(pos, dotId);
-      const changePos = this.percentageRatios[dotId] - validPos;
+      const changePos = this.dotsPositions[dotId] - validPos;
 
       if (!changePos) {
         return;
       }
 
-      
+      this.dotsPositions[dotId] = validPos;
     },
     getValidPos(pos, dotId) {
       const range = this.dotValueRanges[dotId];
@@ -226,7 +230,7 @@ export default {
     transform: translateY(-50%);
     background-color: #DFDFDF;
     border-radius: 1px;
-    transition: width .15s ease-in-out;
+    // transition: width .15s ease-in-out;
 
     &_right {
       right: 0;
@@ -245,7 +249,7 @@ export default {
     border-radius: 50%;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15);
     transform: translateX(-50%);
-    transition: left .15s ease-in-out;
+    // transition: left .15s ease-in-out;
     cursor: pointer;
 
     &:active {
