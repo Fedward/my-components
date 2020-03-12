@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>{{values.lower}}<br>{{values.upper}}</div>
+    <!-- <div>{{values.lower}}<br>{{values.upper}}</div> -->
     <div class="range-filter">
       <div class="range">
         <input
@@ -75,6 +75,12 @@ export default {
     lazy: {
       default: false,
     },
+    resetBtn: {
+      default: false,
+    },
+    title: String,
+    titlePostfix: String,
+    presets: Array,
   },
   data() {
     return {
