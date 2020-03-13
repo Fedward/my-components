@@ -2,52 +2,58 @@
   <div>
     <!-- <div>{{values.lower}}<br>{{values.upper}}</div> -->
     <div class="range-filter">
-      <div class="range">
-        <input
-          class="range__input"
-          type="number"
-          :min="min"
-          :max="values.upper"
-          v-model="values.lower"
-          @input="setPosByValue($event.target.value, 'lower')"
-        >
-        <span class="range__separator">–</span>
-        <input
-          class="range__input"
-          type="number"
-          :min="values.lower"
-          :max="max"
-          v-model="values.upper"
-          @input="setPosByValue($event.target.value, 'upper')"
-        >
+      <div class="range-filter__header">
+        {{ title }}, <span class="range-filter__postfix">{{ titlePostfix }}</span>
       </div>
 
-      <div class="slider" :style="styles.slider" ref="slider">
-        <div class="slider__rail" :style="styles.rail"></div>
-        <div
-          class="slider__inactive-rail"
-          :style="[styles.rail, { width: `${dotsPositions.lower}%` }]"
-        ></div>
-        <div
-          class="slider__inactive-rail slider__inactive-rail_right"
-          :style="[styles.rail, { width: `${100 - dotsPositions.upper}%` }]"
-        ></div>
+      <div class="range-filter__collapsible">
+        <div class="range">
+          <input
+            class="range__input"
+            type="number"
+            :min="min"
+            :max="values.upper"
+            v-model="values.lower"
+            @input="setPosByValue($event.target.value, 'lower')"
+          >
+          <span class="range__separator">–</span>
+          <input
+            class="range__input"
+            type="number"
+            :min="values.lower"
+            :max="max"
+            v-model="values.upper"
+            @input="setPosByValue($event.target.value, 'upper')"
+          >
+        </div>
 
-        <div class="slider__slide-zone">
+        <div class="slider" :style="styles.slider" ref="slider">
+          <div class="slider__rail" :style="styles.rail"></div>
           <div
-            class="slider__dot"
-            ref="lower"
-            :style="[styles.dot, { left: `${dotsPositions.lower}%` }]"
-            @mousedown="dragStart($event, 'lower')"
-            @touchstart="dragStart($event, 'lower')"
+            class="slider__inactive-rail"
+            :style="[styles.rail, { width: `${dotsPositions.lower}%` }]"
           ></div>
           <div
-            class="slider__dot"
-            ref="upper"
-            :style="[styles.dot, { left: `${dotsPositions.upper}%` }]"
-            @mousedown="dragStart($event, 'upper')"
-            @touchstart="dragStart($event, 'upper')"
+            class="slider__inactive-rail slider__inactive-rail_right"
+            :style="[styles.rail, { width: `${100 - dotsPositions.upper}%` }]"
           ></div>
+
+          <div class="slider__slide-zone">
+            <div
+              class="slider__dot"
+              ref="lower"
+              :style="[styles.dot, { left: `${dotsPositions.lower}%` }]"
+              @mousedown="dragStart($event, 'lower')"
+              @touchstart="dragStart($event, 'lower')"
+            ></div>
+            <div
+              class="slider__dot"
+              ref="upper"
+              :style="[styles.dot, { left: `${dotsPositions.upper}%` }]"
+              @mousedown="dragStart($event, 'upper')"
+              @touchstart="dragStart($event, 'upper')"
+            ></div>
+          </div>
         </div>
       </div>
     </div>
@@ -178,7 +184,7 @@ export default {
       this.dotsPositions[sideId] = validPos;
     },
     bindEvents() {
-      document.addEventListener('touchmove', this.dragMove);
+      document.addEventListener('touchmove', this.dragMove, { passive: false });
       document.addEventListener('touchend', this.dragEnd);
       document.addEventListener('mousemove', this.dragMove);
       document.addEventListener('mouseup', this.dragEnd);
@@ -204,7 +210,18 @@ export default {
 
 <style lang="less">
 .range-filter {
-  padding: 16px 24px 32px;
+  padding: 16px 16px 32px;
+
+  &__header {
+    font-size: 16px;
+    line-height: 24px;
+    color: #333333;
+    margin-bottom: 16px;
+  }
+
+  &__postfix {
+    color: #A6A6A6;
+  }
 
   .range {
     margin-bottom: 16px;

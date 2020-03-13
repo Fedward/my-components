@@ -1,8 +1,10 @@
 <template>
   <div id="app">
     <RangeFilter
-      min="1"
-      max="4"
+      title="Price"
+      titlePostfix="usd"
+      min="100"
+      max="300"
       dotSize="16"
       railWidth="4"
     />
@@ -10,7 +12,7 @@
 </template>
 
 <script>
-import RangeFilter from './components/RangeFilter/index.vue';
+import RangeFilter from './components/RangeFilter.vue';
 
 export default {
   name: 'App',
@@ -30,11 +32,14 @@ body {
 #app {
   font-family: 'Roboto', sans-serif;
   margin: auto;
-  background-color: #F7F7F7;
   border-radius: 4px;
 
   & > *:not(:last-child) {
     border-bottom: 1px solid #DFDFDF;;
+  }
+
+  @media screen and (min-width: 1200px) {
+    background-color: #F7F7F7;
   }
 }
 </style>
