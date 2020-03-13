@@ -11,7 +11,7 @@
           v-model="values.lower"
           @input="setPosByValue($event.target.value, 'lower')"
         >
-        <span class="range__separator">-</span>
+        <span class="range__separator">–</span>
         <input
           class="range__input"
           type="number"
@@ -124,8 +124,8 @@ export default {
     setScale() {
       this.scale = Math.floor(this.$refs.slider.offsetWidth) / 100;
     },
-    dragStart(e, dotId) {
-      this.currentDraggableDot = dotId;
+    dragStart(e, sideId) {
+      this.currentDraggableDot = sideId;
       e.preventDefault();
     },
     dragMove(e) {
@@ -144,19 +144,19 @@ export default {
 
       this.currentDraggableDot = null;
     },
-    setDotPos(pos, dotId) {
-      const validPos = this.getValidPos(pos, dotId);
-      const changePos = this.dotsPositions[dotId] - validPos;
+    setDotPos(pos, sideId) {
+      const validPos = this.getValidPos(pos, sideId);
+      const changePos = this.dotsPositions[sideId] - validPos;
 
       if (!changePos) {
         return;
       }
 
-      this.dotsPositions[dotId] = validPos;
-      this.setValueByPos(validPos, dotId);
+      this.dotsPositions[sideId] = validPos;
+      this.setValueByPos(validPos, sideId);
     },
-    getValidPos(pos, dotId) {
-      const range = this.dotValueRanges[dotId];
+    getValidPos(pos, sideId) {
+      const range = this.dotValueRanges[sideId];
 
       if (pos < range[0]) {
         return range[0];
@@ -168,11 +168,14 @@ export default {
 
       return pos;
     },
-    setValueByPos(pos, dotId) {
-      this.values[dotId] = Math.floor(pos / this.gap + parseInt(this.min, 10));
+    setValueByPos(pos, sideId) {
+      this.values[sideId] = Math.floor(pos / this.gap + parseInt(this.min, 10));
     },
-    setPosByValue(val, valueType) {
-      this.dotsPositions[valueType] = (val - this.min) * this.gap;
+    setPosByValue(val, sideId) {
+      const newPos = (val - this.min) * this.gap;
+      const validPos = this.getValidPos(newPos, sideId);
+
+      this.dotsPositions[sideId] = validPos;
     },
     bindEvents() {
       document.addEventListener('touchmove', this.dragMove);
@@ -202,79 +205,79 @@ export default {
 <style lang="less">
 .range-filter {
   padding: 16px 24px 32px;
-  background-color: #F7F7F7;
-}
 
-.range {
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  .range {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-  &__input {
-    flex: 1;
-    font-size: 16px;
-    line-height: 22px;
-    padding: 8px 16px;
-    border: 1px solid #DFDFDF;
-    border-radius: 4px;
-    -moz-appearance: textfield;
+    &__input {
+      width: 100%;
+      flex: 1;
+      font-size: 16px;
+      line-height: 22px;
+      padding: 8px 16px;
+      border: 1px solid #DFDFDF;
+      border-radius: 4px;
+      -moz-appearance: textfield;
 
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    }
+
+    &__separator {
+      margin-left: 2px;
+      margin-right: 2px;
     }
   }
 
-  &__separator {
-    margin-left: 2px;
-    margin-right: 2px;
-  }
-}
-
-.slider {
-  position: relative;
-
-  &__rail {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100%;
-    background-color: #C62828;
-    border-radius: 1px
-  }
-
-  &__inactive-rail {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #DFDFDF;
-    border-radius: 1px;
-    // transition: width .15s ease-in-out;
-
-    &_right {
-      right: 0;
-    }
-  }
-
-  &__slide-zone {
+  .slider {
     position: relative;
-    height: 100%;
-  }
 
-  &__dot {
-    position: absolute;
-    background-color: #FFFFFF;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15);
-    transform: translateX(-50%);
-    // transition: left .15s ease-in-out;
-    cursor: pointer;
+    &__rail {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      background-color: #C62828;
+      border-radius: 1px
+    }
 
-    &:active {
-      background-color: #dadada;
+    &__inactive-rail {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #DFDFDF;
+      border-radius: 1px;
+      // transition: width .15s ease-in-out;
+
+      &_right {
+        right: 0;
+      }
+    }
+
+    &__slide-zone {
+      position: relative;
+      height: 100%;
+    }
+
+    &__dot {
+      position: absolute;
+      background-color: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15);
+      transform: translateX(-50%);
+      // transition: left .15s ease-in-out;
+      cursor: pointer;
+
+      &:active {
+        background-color: #dadada;
+      }
     }
   }
 }

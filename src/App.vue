@@ -20,12 +20,21 @@ export default {
 };
 </script>
 
-<style>
-@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
+<style lang="less">
+@import (css) url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
+
+body {
+  margin: 0;
+}
 
 #app {
   font-family: 'Roboto', sans-serif;
-  width: 280px;
   margin: auto;
+  background-color: #F7F7F7;
+  border-radius: 4px;
+
+  & > *:not(:last-child) {
+    border-bottom: 1px solid #DFDFDF;;
+  }
 }
 </style>
