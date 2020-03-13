@@ -3,10 +3,20 @@
     <!-- <div>{{values.lower}}<br>{{values.upper}}</div> -->
     <div class="range-filter">
       <div class="range-filter__header">
-        {{ title }}, <span class="range-filter__postfix">{{ titlePostfix }}</span>
+        <div class="range-filter__title">
+          {{ title }}, <span class="range-filter__postfix">{{ titlePostfix }}</span>
+        </div>
+        <button
+          class="range-filter__toggle-btn"
+          :class="{ 'range-filter__toggle-btn_opened': !collapsed }"
+          @click="collapsed = !collapsed"
+        >toggle</button>
       </div>
 
-      <div class="range-filter__collapsible">
+      <div
+        class="range-filter__collapsible"
+        :class="{ 'range-filter__collapsible_collapsed': collapsed }"
+      >
         <div class="range">
           <input
             class="range__input"
@@ -90,6 +100,7 @@ export default {
   },
   data() {
     return {
+      collapsed: true,
       values: {
         lower: this.min,
         upper: this.max,
@@ -213,14 +224,40 @@ export default {
   padding: 16px 16px 32px;
 
   &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  &__title {
     font-size: 16px;
     line-height: 24px;
     color: #333333;
-    margin-bottom: 16px;
   }
 
   &__postfix {
     color: #A6A6A6;
+  }
+
+  &__toggle-btn {
+
+    @media screen and (min-width: 1200px) {
+      display: none;
+    }
+
+    &_opened {
+      background-color: aquamarine;
+    }
+  }
+
+  &__collapsible {
+    &_collapsed {
+      display: none;
+
+      @media screen and (min-width: 1200px) {
+        display: block;
+      }
+    }
   }
 
   .range {
