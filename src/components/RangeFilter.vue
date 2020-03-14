@@ -100,7 +100,7 @@ export default {
   },
   data() {
     return {
-      collapsed: false,
+      collapsed: true,
       values: {
         lower: this.min,
         upper: this.max,
@@ -139,7 +139,13 @@ export default {
   },
   methods: {
     setScale() {
-      this.scale = Math.floor(this.$refs.slider.offsetWidth) / 100;
+      const wasCollapsed = this.collapsed;
+      this.collapsed = false;
+      // calculate width only when filter visible in DOM
+      this.$nextTick(() => {
+        this.scale = Math.floor(this.$refs.slider.offsetWidth) / 100;
+        this.collapsed = wasCollapsed;
+      });
     },
     dragStart(e, sideId) {
       this.currentDraggableDot = sideId;
@@ -151,8 +157,16 @@ export default {
       }
 
       e.preventDefault();
-      const pos = getEventOffsetXRelativeToElem(e, this.$refs.slider) / this.scale;
-      this.setDotPos(pos, this.currentDraggableDot);
+      const { currentDraggableDot } = this;
+      const newPos = getEventOffsetXRelativeToElem(e, this.$refs.slider) / this.scale;
+      const validNewPos = this.getNewDotPos(newPos, currentDraggableDot);
+
+      if (validNewPos === false) {
+        return;
+      }
+
+      this.dotsPositions[currentDraggableDot] = validNewPos;
+      this.setValueByPos(validNewPos, currentDraggableDot);
     },
     dragEnd() {
       if (!this.currentDraggableDot) {
@@ -161,16 +175,26 @@ export default {
 
       this.currentDraggableDot = null;
     },
-    setDotPos(pos, sideId) {
+    setValueByPos(pos, sideId) {
+      this.values[sideId] = Math.floor(pos / this.gap + parseInt(this.min, 10));
+    },
+    setPosByValue(val, sideId) {
+      const newPos = (val - this.min) * this.gap;
+      const validNewPos = this.getNewDotPos(newPos, sideId);
+
+      if (validNewPos !== false) {
+        this.dotsPositions[sideId] = validNewPos;
+      }
+    },
+    getNewDotPos(pos, sideId) {
       const validPos = this.getValidPos(pos, sideId);
       const changePos = this.dotsPositions[sideId] - validPos;
 
       if (!changePos) {
-        return;
+        return false;
       }
 
-      this.dotsPositions[sideId] = validPos;
-      this.setValueByPos(validPos, sideId);
+      return validPos;
     },
     getValidPos(pos, sideId) {
       const range = this.dotValueRanges[sideId];
@@ -184,15 +208,6 @@ export default {
       }
 
       return pos;
-    },
-    setValueByPos(pos, sideId) {
-      this.values[sideId] = Math.floor(pos / this.gap + parseInt(this.min, 10));
-    },
-    setPosByValue(val, sideId) {
-      const newPos = (val - this.min) * this.gap;
-      const validPos = this.getValidPos(newPos, sideId);
-
-      this.dotsPositions[sideId] = validPos;
     },
     bindEvents() {
       document.addEventListener('touchmove', this.dragMove, { passive: false });
@@ -212,7 +227,6 @@ export default {
   mounted() {
     this.setScale();
     this.bindEvents();
-    this.collapsed = true;
   },
   beforeDestroy() {
     this.unbindEvents();
@@ -247,7 +261,7 @@ export default {
     }
 
     &_opened {
-      background-color: aquamarine;
+      background-color: rgb(197, 229, 255);
     }
   }
 
