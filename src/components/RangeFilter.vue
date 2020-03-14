@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <div>{{values.lower}}<br>{{values.upper}}</div> -->
     <div class="range-filter">
       <div class="range-filter__header">
         <div class="range-filter__title">
@@ -23,8 +22,8 @@
             type="number"
             :min="min"
             :max="values.upper"
-            v-model="values.lower"
-            @input="setPosByValue($event.target.value, 'lower')"
+            :value="values.lower"
+            @change="setNewVal($event.target, 'lower')"
           >
           <span class="range__separator">–</span>
           <input
@@ -32,8 +31,8 @@
             type="number"
             :min="values.lower"
             :max="max"
-            v-model="values.upper"
-            @input="setPosByValue($event.target.value, 'upper')"
+            :value="values.upper"
+            @change="setNewVal($event.target, 'upper')"
           >
         </div>
 
@@ -78,9 +77,11 @@ export default {
   name: 'RangeFilter',
   props: {
     min: {
+      type: Number,
       default: 0,
     },
     max: {
+      type: Number,
       default: 100,
     },
     dotSize: {
@@ -132,10 +133,16 @@ export default {
     };
   },
   computed: {
-    dotValueRanges() {
+    ranges() {
       return {
-        lower: [0, this.dotsPositions.upper],
-        upper: [this.dotsPositions.lower, 100],
+        values: {
+          lower: [this.min, this.values.upper],
+          upper: [this.values.lower, this.max],
+        },
+        dots: {
+          lower: [0, this.dotsPositions.upper],
+          upper: [this.dotsPositions.lower, 100],
+        },
       };
     },
   },
@@ -177,8 +184,18 @@ export default {
 
       this.currentDraggableDot = null;
     },
-    setValueByPos(pos, sideId) {
-      this.values[sideId] = Math.floor(pos / this.gap + parseInt(this.min, 10));
+    setNewVal(input, sideId) {
+      const validVal = this.getValFromRange(Number(input.value), sideId, 'values');
+      const changeVal = this.values[sideId] - validVal;
+
+      if (!changeVal) {
+        // eslint-disable-next-line no-param-reassign
+        input.value = this.values[sideId];
+        return;
+      }
+
+      this.values[sideId] = validVal;
+      this.setPosByValue(validVal, sideId);
     },
     setPosByValue(val, sideId) {
       const newPos = (val - this.min) * this.gap;
@@ -188,8 +205,11 @@ export default {
         this.dotsPositions[sideId] = validNewPos;
       }
     },
+    setValueByPos(pos, sideId) {
+      this.values[sideId] = Math.floor(pos / this.gap + parseInt(this.min, 10));
+    },
     getNewDotPos(pos, sideId) {
-      const validPos = this.getValidPos(pos, sideId);
+      const validPos = this.getValFromRange(pos, sideId, 'dots');
       const changePos = this.dotsPositions[sideId] - validPos;
 
       if (!changePos) {
@@ -198,18 +218,18 @@ export default {
 
       return validPos;
     },
-    getValidPos(pos, sideId) {
-      const range = this.dotValueRanges[sideId];
+    getValFromRange(val, sideId, rangeType) {
+      const range = this.ranges[rangeType][sideId];
 
-      if (pos < range[0]) {
+      if (val < range[0]) {
         return range[0];
       }
 
-      if (pos > range[1]) {
+      if (val > range[1]) {
         return range[1];
       }
 
-      return pos;
+      return val;
     },
     bindEvents() {
       document.addEventListener('touchmove', this.dragMove, { passive: false });

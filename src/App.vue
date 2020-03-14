@@ -3,8 +3,8 @@
     <RangeFilter
       title="Price"
       titlePostfix="usd"
-      min="100"
-      max="300"
+      :min="100"
+      :max="300"
       dotSize="16"
       railWidth="4"
     />
