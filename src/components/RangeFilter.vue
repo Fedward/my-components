@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import debounce from 'lodash.debounce';
 import { getEventOffsetXRelativeToElem } from './utils';
 
 export default {
@@ -127,6 +128,7 @@ export default {
           height: `${this.dotSize - 2}px`,
         },
       },
+      debouncedRecalcScale: null,
     };
   },
   computed: {
@@ -215,6 +217,7 @@ export default {
       document.addEventListener('mousemove', this.dragMove);
       document.addEventListener('mouseup', this.dragEnd);
       document.addEventListener('mouseleave', this.dragEnd);
+      window.addEventListener('resize', this.debouncedRecalcScale);
     },
     unbindEvents() {
       document.removeEventListener('touchmove', this.dragMove);
@@ -222,7 +225,11 @@ export default {
       document.removeEventListener('mousemove', this.dragMove);
       document.removeEventListener('mouseup', this.dragEnd);
       document.removeEventListener('mouseleave', this.dragEnd);
+      window.removeEventListener('resize', this.debouncedRecalcScale);
     },
+  },
+  created() {
+    this.debouncedRecalcScale = debounce(this.setScale, 500);
   },
   mounted() {
     this.setScale();
