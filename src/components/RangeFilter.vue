@@ -100,7 +100,7 @@ export default {
   },
   data() {
     return {
-      collapsed: true,
+      collapsed: false,
       values: {
         lower: this.min,
         upper: this.max,
@@ -212,6 +212,7 @@ export default {
   mounted() {
     this.setScale();
     this.bindEvents();
+    this.collapsed = true;
   },
   beforeDestroy() {
     this.unbindEvents();
