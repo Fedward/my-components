@@ -111,7 +111,6 @@ export default {
     railWidth: {
       default: 4,
     },
-    lazy: Boolean,
     resetBtn: Boolean,
     title: String,
     titlePostfix: String,
@@ -197,6 +196,7 @@ export default {
 
       this.dotsPositions[currentDraggableDot] = validNewPos;
       this.setValueByPos(validNewPos, currentDraggableDot);
+      this.emitChange();
     },
     dragEnd() {
       if (!this.currentDraggableDot) {
@@ -218,6 +218,7 @@ export default {
       this.values[sideId] = validVal;
       this.setPosByValue(validVal, sideId);
       this.uncheckPresetInputs();
+      this.emitChange();
     },
     setPosByValue(val, sideId) {
       const newPos = (val - this.min) * this.gap;
@@ -246,6 +247,7 @@ export default {
 
       this.setPosByValue(validMin, 'lower');
       this.setPosByValue(validMax, 'upper');
+      this.emitChange();
     },
     uncheckPresetInputs() {
       this.$refs.presetInputs.forEach((input) => {
@@ -275,6 +277,9 @@ export default {
       }
 
       return val;
+    },
+    emitChange() {
+      this.$emit('change', [this.values.lower, this.values.upper]);
     },
     bindEvents() {
       document.addEventListener('touchmove', this.dragMove, { passive: false });

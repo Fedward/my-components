@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    {{ range }}
     <RangeFilter
       name="price"
       title="Price"
@@ -10,6 +11,7 @@
         { text: 'Any' },
         { text: '120-240', range: [120, 240]}
       ]"
+      @change="range = $event"
     />
   </div>
 </template>
@@ -19,6 +21,11 @@ import RangeFilter from './components/RangeFilter.vue';
 
 export default {
   name: 'App',
+  data() {
+    return {
+      range: [0, 0],
+    };
+  },
   components: {
     RangeFilter,
   },
