@@ -1,12 +1,15 @@
 <template>
   <div id="app">
     <RangeFilter
+      name="price"
       title="Price"
       titlePostfix="usd"
       :min="100"
       :max="300"
-      dotSize="16"
-      railWidth="4"
+      :presets="[
+        { text: 'Any' },
+        { text: '120-240', range: [120, 240]}
+      ]"
     />
   </div>
 </template>

@@ -23,7 +23,7 @@
             :min="min"
             :max="values.upper"
             :value="values.lower"
-            @change="setNewVal($event.target, 'lower')"
+            @change="setNewValByInput($event.target, 'lower')"
           >
           <span class="range__separator">–</span>
           <input
@@ -32,7 +32,7 @@
             :min="values.lower"
             :max="max"
             :value="values.upper"
-            @change="setNewVal($event.target, 'upper')"
+            @change="setNewValByInput($event.target, 'upper')"
           >
         </div>
 
@@ -65,6 +65,25 @@
             ></div>
           </div>
         </div>
+
+        <div class="presets" v-if="presets">
+          <div class="presets__item" v-for="(preset, i) in presets" :key="i">
+            <input
+              class="presets__input"
+              type="radio"
+              :name="name"
+              :id="`${name}_${i}`"
+              @change="selectPreset(preset.range)"
+              ref="presetInputs"
+            >
+            <label
+              class="presets__label"
+              :for="`${name}_${i}`"
+            >
+              {{ preset.text }}
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -77,6 +96,7 @@ import { getEventOffsetXRelativeToElem } from './utils';
 export default {
   name: 'RangeFilter',
   props: {
+    name: String,
     min: {
       type: Number,
       default: 0,
@@ -91,12 +111,8 @@ export default {
     railWidth: {
       default: 4,
     },
-    lazy: {
-      default: false,
-    },
-    resetBtn: {
-      default: false,
-    },
+    lazy: Boolean,
+    resetBtn: Boolean,
     title: String,
     titlePostfix: String,
     presets: Array,
@@ -163,6 +179,7 @@ export default {
     dragStart(e, sideId) {
       this.currentDraggableDot = sideId;
       e.preventDefault();
+      this.uncheckPresetInputs();
     },
     dragMove(e) {
       if (!this.currentDraggableDot) {
@@ -188,7 +205,7 @@ export default {
 
       this.currentDraggableDot = null;
     },
-    setNewVal(input, sideId) {
+    setNewValByInput(input, sideId) {
       const validVal = this.getValFromRange(Number(input.value), sideId, 'values');
       const changeVal = this.values[sideId] - validVal;
 
@@ -200,6 +217,7 @@ export default {
 
       this.values[sideId] = validVal;
       this.setPosByValue(validVal, sideId);
+      this.uncheckPresetInputs();
     },
     setPosByValue(val, sideId) {
       const newPos = (val - this.min) * this.gap;
@@ -211,6 +229,29 @@ export default {
     },
     setValueByPos(pos, sideId) {
       this.values[sideId] = Math.floor(pos / this.gap + parseInt(this.min, 10));
+    },
+    selectPreset(range = [this.min, this.max]) {
+      const [newMin, newMax] = range;
+      if (newMin === this.values.lower && newMax === this.values.upper) {
+        return;
+      }
+
+      const validMin = this.getValFromRange(newMin, 'lower', 'values');
+      const validMax = this.getValFromRange(newMax, 'upper', 'values');
+
+      this.values = {
+        lower: validMin,
+        upper: validMax,
+      };
+
+      this.setPosByValue(validMin, 'lower');
+      this.setPosByValue(validMax, 'upper');
+    },
+    uncheckPresetInputs() {
+      this.$refs.presetInputs.forEach((input) => {
+        // eslint-disable-next-line no-param-reassign
+        input.checked = false;
+      });
     },
     getNewDotPos(pos, sideId) {
       const validPos = this.getValFromRange(pos, sideId, 'dots');
@@ -286,7 +327,6 @@ export default {
   }
 
   &__toggle-btn {
-
     @media screen and (min-width: 1200px) {
       display: none;
     }
@@ -338,6 +378,10 @@ export default {
   .slider {
     position: relative;
 
+    &:not(:last-child) {
+      margin-bottom: 24px;
+    }
+
     &__rail {
       position: absolute;
       top: 50%;
@@ -382,6 +426,57 @@ export default {
       &_max-pos {
         z-index: 1;
       }
+    }
+  }
+
+  .presets {
+    @radioBtnInnerSize: 14px;
+    @radioBorderSize: 1px;
+    @radioBtnFullSize: @radioBtnInnerSize + 2 * @radioBorderSize;
+    @radioCheckedTagSize: 8px;
+
+    &__item:not(:last-child) {
+      margin-bottom: 8px;
+    }
+
+    &__input {
+      display: none;
+    }
+
+    &__label {
+      position: relative;
+      font-size: 16px;
+      line-height: 24px;
+      color: #404040;
+      padding-left: 8px + @radioBtnFullSize;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: @radioBtnInnerSize;
+        height: @radioBtnInnerSize;
+        border: @radioBorderSize solid #DFDFDF;
+        border-radius: 50%;
+        background-color: #fff;
+      }
+
+      &::after {
+        display: none;
+        content: '';
+        position: absolute;
+        left: (@radioBtnFullSize - @radioCheckedTagSize) / 2;
+        top: (@radioBtnFullSize - @radioCheckedTagSize) / 2;
+        width: @radioCheckedTagSize;
+        height: @radioCheckedTagSize;
+        border-radius: 50%;
+        background-color: #C62828;
+      }
+    }
+
+    &__input:checked + label::after {
+      display: block;
     }
   }
 }
