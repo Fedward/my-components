@@ -50,6 +50,7 @@
           <div class="slider__slide-zone">
             <div
               class="slider__dot"
+              :class="{ 'slider__dot_max-pos': lowerDotAtMaxPos }"
               ref="lower"
               :style="[styles.dot, { left: `${dotsPositions.lower}%` }]"
               @mousedown="dragStart($event, 'lower')"
@@ -144,6 +145,9 @@ export default {
           upper: [this.dotsPositions.lower, 100],
         },
       };
+    },
+    lowerDotAtMaxPos() {
+      return this.dotsPositions.lower === 100;
     },
   },
   methods: {
@@ -373,6 +377,10 @@ export default {
 
       &:active {
         background-color: #dadada;
+      }
+
+      &_max-pos {
+        z-index: 1;
       }
     }
   }
